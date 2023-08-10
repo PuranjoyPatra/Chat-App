@@ -1,0 +1,44 @@
+.chatbox {
+  border: 2px solid gray;
+  background-color: bisque;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 5px 0;
+}
+
+.container{
+  display: flex;
+}
+
+.container.me{
+  flex-direction: row-reverse;
+}
+
+.me .chatbox{
+  background-color: cadetblue;
+}
+
+.btm{
+  position: fixed;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  bottom: 2px;
+}
+
+.btm input{
+  flex-grow: 1;
+  padding: 10px 0;
+}
+
+.btm button:hover{
+  cursor: pointer;
+  background-color: green;
+  color: white;
+}
+
+.chat-container{
+  height: 70vh;
+  overflow-y: scroll;
+  border: 2px solid black;
+}
