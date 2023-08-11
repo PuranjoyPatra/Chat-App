@@ -1,89 +1,34 @@
 import logo from "./logo.svg";
 import "./App.css";
-import { useEffect, useRef, useState } from "react";
+import Auth from "./components/Auth";
+import Cookies from "universal-cookie";
+import { useRef, useState } from "react";
+import Chat from "./components/Chat";
 
-import { getDatabase, ref, push, set, onChildAdded } from "firebase/database";
+const cookies = new Cookies()
 
 function App() {
-  const [name, setName] = useState("");
-  const [msg, setMsg] = useState("");
-  const [chats, setChats] = useState([]);
-  const showChat = useRef(chats);
-
-  const db = getDatabase();
-  const chatListRef = ref(db, "chats");
-
-  const updateHeight = () => {
-    const el = document.getElementById("chat");
-    if (el) {
-      el.scrollTop = el.scrollHeight;
-    }
-  };
-
-  useEffect(() => {
-    onChildAdded(chatListRef, (data) => {
-      showChat.current = data.val();
-      console.log(showChat.current);
-    });
-    if (showChat.current !== chats) {
-      setChats(chats=>[...showChat.current,...chats]);
-// console.log(chats);
-      setTimeout(() => {
-        updateHeight();
-      }, 1000);
-    }
-  }, []);
-
-  const sendChat = () => {
-    const chatRef = push(chatListRef);
-    set(chatRef, {
-      name,
-      message: msg,
-    });
-
-    setMsg("");
-  };
-
+  const [isAuth, setIsAuth] = useState(cookies.get("auth-token"))
+  const [room, setRoom] = useState(null)
+  const roomInputRef = useRef("")
+  if(!isAuth){
   return (
     <div>
-      {name ? null : (
-        <div>
-          <input
-            type="text"
-            placeholder="enter your name"
-            onBlur={(e) => setName(e.target.value)}
-          />
-        </div>
-      )}
-      {name ? (
-        <div>
-          <h1>User: {name}</h1>
-          <div id="chat" className="chat-container">
-            {chats.map((c, i) => (
-              <div
-                key={i}
-                className={`container ${c.name === name ? "me" : ""}`}
-              >
-                <p className="chatbox">
-                  <strong>{c.name}:</strong>
-                  <span>{c.message}</span>
-                </p>
-              </div>
-            ))}
-          </div>
-          <div className="btm">
-            <input
-              type="text"
-              onInput={(e) => setMsg(e.target.value)}
-              value={msg}
-              placeholder="enter your chat"
-            />
-            <button onClick={(e) => sendChat()}>send</button>
-          </div>
-        </div>
-      ) : null}
+      <Auth setIsAuth={setIsAuth}/>
     </div>
   );
+  }
+
+  return(
+    <div>
+
+      {room?<div><Chat room={room}/></div>:<div className="room">
+        <label>Enter Room Nmae:</label>
+        <input ref={roomInputRef}/>
+        <button onClick={()=>setRoom(roomInputRef.current.value)}>Enter Chat</button>
+        </div>}
+    </div>
+  )
 }
 
 export default App;
